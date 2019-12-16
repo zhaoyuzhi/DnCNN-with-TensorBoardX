@@ -153,8 +153,8 @@ def Trainer(opt):
             # Save model at certain epochs or iterations
             save_model(opt, (epoch + 1), (iters_done + 1), len(train_loader), generator)
 
-            # Learning rate decrease at certain epochs
-            adjust_learning_rate(opt, (iters_done + 1), optimizer_G)
+        # Learning rate decrease at certain epochs
+        adjust_learning_rate(opt, (epoch + 1), optimizer_G)
 
         ### sampling
         utils.save_sample_png(opt, epoch, noisy_img, recon_img, img, addition_str = 'training')
