@@ -40,8 +40,9 @@ if __name__ == "__main__":
     parser.add_argument('--init_type', type = str, default = 'kaiming', help = 'initialization type of generator')
     parser.add_argument('--init_gain', type = float, default = 0.02, help = 'initialization gain of generator')
     # Dataset parameters
-    parser.add_argument('--train_root', type = str, default = '../Documents/data/target', help = 'training images baseroot')
-    parser.add_argument('--val_root', type = str, default = '../Documents/data/target', help = 'validation images baseroot')
+    parser.add_argument('--train_root', type = str, default = '../Documents/data/train', help = 'training images baseroot')
+    parser.add_argument('--val_root', type = str, default = '../Documents/data/val', help = 'validation images baseroot')
+    parser.add_argument('--save_root', type = str, default = './model', help = 'models saving root')
     parser.add_argument('--sample_root', type = str, default = './sample', help = 'sample images root')
     parser.add_argument('--crop_size', type = int, default = 256, help = 'single patch size')
     parser.add_argument('--geometry_aug', type = bool, default = False, help = 'geometry augmentation (scaling)')

@@ -1,6 +1,6 @@
 import time
 import datetime
-import itertools
+import os
 import numpy as np
 import torch
 import torch.nn as nn
@@ -53,23 +53,35 @@ def Trainer(opt):
     # Save the model if pre_train == True
     def save_model(opt, epoch, iteration, len_dataset, network):
         """Save the model at "checkpoint_interval" and its multiple"""
+        # Judge name
+        if not os.path.exists(opt.save_root):
+            os.makedirs(opt.save_root)
+        # Save model dict
         if opt.multi_gpu == True:
             if opt.save_mode == 'epoch':
+                modelname = 'DnCNN_epoch%d_bs%d_mu%d_sigma%d.pth' % (epoch, opt.train_batch_size, opt.mu, opt.sigma)
+                modelpath = os.path.join(opt.save_root, modelname)
                 if (epoch % opt.save_by_epoch == 0) and (iteration % len_dataset == 0):
-                    torch.save(network.module.state_dict(), 'DnCNN_epoch%d_bs%d_mu%d_sigma%d.pth' % (epoch, opt.batch_size, opt.mu, opt.sigma))
+                    torch.save(network.module.state_dict(), modelpath)
                     print('The trained model is successfully saved at epoch %d' % (epoch))
             if opt.save_mode == 'iter':
+                modelname = 'DnCNN_iter%d_bs%d_mu%d_sigma%d.pth' % (iteration, opt.train_batch_size, opt.mu, opt.sigma)
+                modelpath = os.path.join(opt.save_root, modelname)
                 if iteration % opt.save_by_iter == 0:
-                    torch.save(network.module.state_dict(), 'DnCNN_iter%d_bs%d_mu%d_sigma%d.pth' % (iteration, opt.batch_size, opt.mu, opt.sigma))
+                    torch.save(network.module.state_dict(), modelpath)
                     print('The trained model is successfully saved at iteration %d' % (iteration))
         else:
             if opt.save_mode == 'epoch':
+                modelname = 'DnCNN_epoch%d_bs%d_mu%d_sigma%d.pth' % (epoch, opt.train_batch_size, opt.mu, opt.sigma)
+                modelpath = os.path.join(opt.save_root, modelname)
                 if (epoch % opt.save_by_epoch == 0) and (iteration % len_dataset == 0):
-                    torch.save(network.state_dict(), 'DnCNN_epoch%d_bs%d_mu%d_sigma%d.pth' % (epoch, opt.batch_size, opt.mu, opt.sigma))
+                    torch.save(network.state_dict(), modelpath)
                     print('The trained model is successfully saved at epoch %d' % (epoch))
             if opt.save_mode == 'iter':
+                modelname = 'DnCNN_iter%d_bs%d_mu%d_sigma%d.pth' % (iteration, opt.train_batch_size, opt.mu, opt.sigma)
+                modelpath = os.path.join(opt.save_root, modelname)
                 if iteration % opt.save_by_iter == 0:
-                    torch.save(network.state_dict(), 'DnCNN_iter%d_bs%d_mu%d_sigma%d.pth' % (iteration, opt.batch_size, opt.mu, opt.sigma))
+                    torch.save(network.state_dict(), modelpath)
                     print('The trained model is successfully saved at iteration %d' % (iteration))
 
     # ----------------------------------------
