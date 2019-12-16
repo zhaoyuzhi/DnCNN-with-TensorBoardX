@@ -24,7 +24,7 @@ def Trainer(opt):
     # Handle multiple GPUs
     gpu_num = torch.cuda.device_count()
     print("There are %d GPUs used" % gpu_num)
-    opt.batch_size *= gpu_num
+    opt.train_batch_size *= gpu_num
     opt.num_workers *= gpu_num
 
     # Loss functions
@@ -77,11 +77,14 @@ def Trainer(opt):
     # ----------------------------------------
 
     # Define the dataset
-    trainset = dataset.DenoisingDataset(opt)
-    print('The overall number of images:', len(trainset))
+    trainset = dataset.DenoisingDataset(opt, opt.train_root)
+    valset = dataset.DenoisingDataset(opt, opt.val_root)
+    print('The overall number of training images:', len(trainset))
+    print('The overall number of validation images:', len(valset))
 
     # Define the dataloader
-    dataloader = DataLoader(trainset, batch_size = opt.batch_size, shuffle = True, num_workers = opt.num_workers, pin_memory = True)
+    train_loader = DataLoader(trainset, batch_size = opt.train_batch_size, shuffle = True, num_workers = opt.num_workers, pin_memory = True)
+    val_loader = DataLoader(valset, batch_size = opt.val_batch_size, shuffle = False, num_workers = opt.num_workers, pin_memory = True)
 
     # ----------------------------------------
     #                 Training
@@ -104,7 +107,8 @@ def Trainer(opt):
         if epoch == 0:
             iters_done = 0
 
-        for i, (noisy_img, img) in enumerate(dataloader):
+        ### training
+        for i, (noisy_img, img) in enumerate(train_loader):
 
             # To device
             noisy_img = noisy_img.cuda()
@@ -125,17 +129,49 @@ def Trainer(opt):
             optimizer_G.step()
 
             # Determine approximate time left
-            iters_done = epoch * len(dataloader) + i
-            iters_left = opt.epochs * len(dataloader) - iters_done
+            iters_done = epoch * len(train_loader) + i
+            iters_left = opt.epochs * len(train_loader) - iters_done
             time_left = datetime.timedelta(seconds = iters_left * (time.time() - prev_time))
             prev_time = time.time()
 
             # Print log
             print("\r[Epoch %d/%d] [Batch %d/%d] [Recon Loss: %.4f] Time_left: %s" %
-                ((epoch + 1), opt.epochs, i, len(dataloader), loss.item(), time_left))
+                ((epoch + 1), opt.epochs, i, len(train_loader), loss.item(), time_left))
 
             # Save model at certain epochs or iterations
-            save_model(opt, (epoch + 1), (iters_done + 1), len(dataloader), generator)
+            save_model(opt, (epoch + 1), (iters_done + 1), len(train_loader), generator)
 
             # Learning rate decrease at certain epochs
             adjust_learning_rate(opt, (iters_done + 1), optimizer_G)
+
+        ### sampling
+        utils.save_sample_png(opt, epoch, noisy_img, recon_img, img, addition_str = 'training')
+
+        ### Validation
+        val_PSNR = 0
+        num_of_val_image = 0
+
+        for j, (val_noisy_img, val_img) in enumerate(val_loader):
+            
+            # To device
+            # A is for input image, B is for target image
+            val_noisy_img = val_noisy_img.cuda()
+            val_img = val_img.cuda()
+
+            # Forward propagation
+            val_recon_img = generator(val_noisy_img)
+
+            # Accumulate num of image and val_PSNR
+            num_of_val_image += val_noisy_img.shape[0]
+            val_PSNR += utils.psnr(val_recon_img, val_img, 1) * val_noisy_img.shape[0]
+
+        val_PSNR = val_PSNR / num_of_val_image
+
+        # Record average PSNR
+        writer.add_scalar('data/val_PSNR', val_PSNR, epoch)
+        print('PSNR at epoch %d: %.4f' % ((epoch + 1), val_PSNR))
+
+        ### sampling
+        utils.save_sample_png(opt, epoch, noisy_img, recon_img, img, addition_str = 'validation')
+
+    writer.close()

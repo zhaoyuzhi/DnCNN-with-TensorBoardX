@@ -20,7 +20,8 @@ if __name__ == "__main__":
     parser.add_argument('--cudnn_benchmark', type = bool, default = True, help = 'True for unchanged input data type')
     # Training parameters
     parser.add_argument('--epochs', type = int, default = 50, help = 'number of epochs of training that ensures 100K training iterations')
-    parser.add_argument('--batch_size', type = int, default = 128, help = 'size of the batches, 128 is recommended')
+    parser.add_argument('--train_batch_size', type = int, default = 128, help = 'size of the batches, 128 is recommended')
+    parser.add_argument('--val_batch_size', type = int, default = 16, help = 'size of the batches, 1 is recommended')
     parser.add_argument('--lr', type = float, default = 0.001, help = 'Adam: learning rate')
     parser.add_argument('--b1', type = float, default = 0.9, help = 'Adam: decay of first order momentum of gradient')
     parser.add_argument('--b2', type = float, default = 0.999, help = 'Adam: decay of second order momentum of gradient')
@@ -39,15 +40,16 @@ if __name__ == "__main__":
     parser.add_argument('--init_type', type = str, default = 'kaiming', help = 'initialization type of generator')
     parser.add_argument('--init_gain', type = float, default = 0.02, help = 'initialization gain of generator')
     # Dataset parameters
-    parser.add_argument('--baseroot', type = str, default = 'C:\\Users\\yzzha\\Desktop\\dataset\\DIV2K\\DIV2K_train_HR', help = 'images baseroot')
+    parser.add_argument('--train_root', type = str, default = '../Documents/data/target', help = 'training images baseroot')
+    parser.add_argument('--val_root', type = str, default = '../Documents/data/target', help = 'validation images baseroot')
+    parser.add_argument('--sample_root', type = str, default = './sample', help = 'sample images root')
     parser.add_argument('--crop_size', type = int, default = 256, help = 'single patch size')
     parser.add_argument('--geometry_aug', type = bool, default = False, help = 'geometry augmentation (scaling)')
-    parser.add_argument('--angle_aug', type = bool, default = True, help = 'geometry augmentation (rotation, flipping)')
+    parser.add_argument('--angle_aug', type = bool, default = False, help = 'geometry augmentation (rotation, flipping)')
     parser.add_argument('--scale_min', type = float, default = 1, help = 'min scaling factor')
     parser.add_argument('--scale_max', type = float, default = 1, help = 'max scaling factor')
     parser.add_argument('--mu', type = int, default = 0, help = 'Gaussian noise mean')
-    parser.add_argument('--sigma', type = int, default = 25, help = 'Gaussian noise variance')
-    parser.add_argument('--bit', type = int, default = 8, help = 'the bitwidth of training images. 8 represents [0, 255]; 16 represents [0, 65535]')
+    parser.add_argument('--sigma', type = float, default = 25, help = 'Gaussian noise variance')
     opt = parser.parse_args()
 
     # ----------------------------------------

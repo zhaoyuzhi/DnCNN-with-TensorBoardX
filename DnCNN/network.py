@@ -42,10 +42,10 @@ class DnCNN(nn.Module):
         super(DnCNN, self).__init__()
         layers = []
         layers.append(Conv2dLayer(opt.in_channels, opt.start_channels, 3, 1, 1, pad_type = opt.pad, activation = opt.activ, norm = 'none'))
-        layers.append(nn.ReLU(inplace=True))
+        layers.append(nn.ReLU())
         for _ in range(opt.m_block - 2):
             layers.append(Conv2dLayer(opt.start_channels, opt.start_channels, 3, 1, 1, pad_type = opt.pad, activation = opt.activ, norm = opt.norm))
-        layers.append(Conv2dLayer(opt.in_channels, opt.start_channels, 3, 1, 1, pad_type = opt.pad, activation = 'sigmoid', norm = 'none'))
+        layers.append(Conv2dLayer(opt.start_channels, opt.out_channels, 3, 1, 1, pad_type = opt.pad, activation = 'sigmoid', norm = 'none'))
         self.dncnn = nn.Sequential(*layers)
 
     def forward(self, x):
