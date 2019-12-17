@@ -130,7 +130,8 @@ def Trainer(opt):
             optimizer_G.zero_grad()
 
             # Forword propagation
-            recon_img = generator(noisy_img)
+            res_img = generator(noisy_img)
+            recon_img = noisy_img - res_img
             loss = criterion_L2(recon_img, img)
 
             # Record losses
