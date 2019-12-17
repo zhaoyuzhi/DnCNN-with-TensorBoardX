@@ -172,7 +172,8 @@ def Trainer(opt):
             val_img = val_img.cuda()
 
             # Forward propagation
-            val_recon_img = generator(val_noisy_img)
+            res_img = generator(val_noisy_img)
+            val_recon_img = val_noisy_img - res_img
 
             # Accumulate num of image and val_PSNR
             num_of_val_image += val_noisy_img.shape[0]
