@@ -60,7 +60,8 @@ if __name__ == "__main__":
         img = img.cuda()
 
         # Generator output
-        recon_img = generator(noisy_img)
+        res_img = generator(noisy_img)
+        recon_img = noisy_img - res_img
 
         # convert to visible image format
         img = img.cpu().numpy().reshape(3, opt.crop_size, opt.crop_size).transpose(1, 2, 0)
