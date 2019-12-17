@@ -30,13 +30,16 @@ class DenoisingDataset(Dataset):
     def __init__(self, opt, baseroot):                                  # root: list ; transform: torch transform
         self.opt = opt
         self.imglist = utils.get_files(baseroot)
-        self.max_white_value = 255
 
     def __getitem__(self, index):
+        
         ## read an image
         img = cv2.imread(self.imglist[index])
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+        # normalization
+        img = img / self.opt.max_white_value
+        
         ## data augmentation
         # random scale
         if self.opt.geometry_aug:
@@ -73,9 +76,7 @@ class DenoisingDataset(Dataset):
         noisy_img = img + noise
 
         # normalization
-        img = img / self.max_white_value
         img = torch.from_numpy(img.transpose(2, 0, 1)).contiguous()
-        noisy_img = noisy_img / self.max_white_value
         noisy_img = torch.from_numpy(noisy_img.transpose(2, 0, 1)).contiguous()
 
         return noisy_img, img
@@ -87,13 +88,16 @@ class FullResDenoisingDataset(Dataset):
     def __init__(self, opt, baseroot):                          	    # root: list ; transform: torch transform
         self.opt = opt
         self.imglist = utils.get_files(baseroot)
-        self.max_white_value = 2 ** opt.bit - 1
 
     def __getitem__(self, index):
+        
         ## read an image
         img = cv2.imread(self.imglist[index])
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+        # normalization
+        img = img / self.opt.max_white_value
+        
         ## re-arrange the data for fitting network
         H_in = img[0].shape[0]
         W_in = img[0].shape[1]
@@ -107,9 +111,7 @@ class FullResDenoisingDataset(Dataset):
         noisy_img = img + noise
 
         # normalization
-        img = img / self.max_white_value
         img = torch.from_numpy(img.transpose(2, 0, 1)).contiguous()
-        noisy_img = noisy_img / self.max_white_value
         noisy_img = torch.from_numpy(noisy_img.transpose(2, 0, 1)).contiguous()
 
         return noisy_img, img
