@@ -30,7 +30,6 @@ class DenoisingDataset(Dataset):
     def __init__(self, opt, baseroot):                                  # root: list ; transform: torch transform
         self.opt = opt
         self.imglist = utils.get_files(baseroot)
-        self.max_white_value = 255
 
     def __getitem__(self, index):
 
@@ -114,8 +113,8 @@ class DenoisingDataset(Dataset):
         
         ### return mode
         if self.opt.return_mode == 'short_denoising':
-            img_short = np.zeros((img.shape[0] // 2, img.shape[1] // 2, img.shape[2]), dtype = np.float64)
-            noisy_img_short = np.zeros((img.shape[0] // 2, img.shape[1] // 2, img.shape[2]), dtype = np.float64)
+            img_short = np.zeros((img.shape[0] // 2, img.shape[1] // 2, img.shape[2] * 2), dtype = np.float64)
+            noisy_img_short = np.zeros((img.shape[0] // 2, img.shape[1] // 2, img.shape[2] * 2), dtype = np.float64)
             if mask_short[0, 0, 0] == 1: # upper left pixel is short exposure
                 img_short[:, :, :3] = img[0::2, 0::2, :]
                 img_short[:, :, 3:6] = img[1::2, 1::2, :]
@@ -126,6 +125,11 @@ class DenoisingDataset(Dataset):
                 img_short[:, :, 3:6] = img[1::2, 0::2, :]
                 noisy_img_short[:, :, :3] = noisy_img[0::2, 1::2, :]
                 noisy_img_short[:, :, 3:6] = noisy_img[1::2, 0::2, :]
+        
+        ### to tensor
+        img_short = torch.from_numpy(img_short).float().permute(2, 0, 1)
+        noisy_img_short = torch.from_numpy(noisy_img_short).float().permute(2, 0, 1)
+        
         return img_short, noisy_img_short
     
     def __len__(self):
