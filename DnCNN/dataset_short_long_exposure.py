@@ -26,6 +26,7 @@ class RandomCrop(object):
         else:
             return img[self.h1: self.h2, self.w1: self.w2]
 
+# QuadBayer Denoising 
 class DenoisingDataset(Dataset):
     def __init__(self, opt, baseroot):                                  # root: list ; transform: torch transform
         self.opt = opt
@@ -124,7 +125,7 @@ class DenoisingDataset(Dataset):
 
         ### to tensor
         img_short = torch.from_numpy(img_short).float().permute(2, 0, 1).contiguous()
-        noisy_img_short = torch.from_numpy(noisy_img_short).float().permute(2, 0, 1)
+        noisy_img_short = torch.from_numpy(noisy_img_short).float().permute(2, 0, 1).contiguous()
 
         return img_short, noisy_img_short
     
@@ -148,8 +149,8 @@ class FullResDenoisingDataset(Dataset):
         ## re-arrange the data for fitting network
         H_in = img[0].shape[0]
         W_in = img[0].shape[1]
-        H_out = int(math.floor(H_in / 8)) * 8
-        W_out = int(math.floor(W_in / 8)) * 8
+        H_out = int(math.floor(H_in / 4)) * 4
+        W_out = int(math.floor(W_in / 4)) * 4
         img = cv2.resize(img, (W_out, H_out))
         
         # add noise
