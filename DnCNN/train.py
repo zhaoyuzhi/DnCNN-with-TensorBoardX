@@ -45,6 +45,11 @@ if __name__ == "__main__":
     parser.add_argument('--save_root', type = str, default = './model', help = 'models saving root')
     parser.add_argument('--sample_root', type = str, default = './sample', help = 'sample images root')
     parser.add_argument('--crop_size', type = int, default = 256, help = 'single patch size')
+    # Normal RGB parameters
+    parser.add_argument('--geometry_aug', type = bool, default = False, help = 'geometry augmentation (scaling)')
+    parser.add_argument('--angle_aug', type = bool, default = False, help = 'geometry augmentation (rotation, flipping)')
+    parser.add_argument('--scale_min', type = float, default = 1, help = 'min scaling factor')
+    parser.add_argument('--scale_max', type = float, default = 1, help = 'max scaling factor')
     # QuadBayer parameters
     parser.add_argument('--short_expo_per_pattern', type = int, default = 2, help = 'QuadBayer short exposure number')
     parser.add_argument('--color_bias_aug', type = bool, default = False, help = 'max scaling factor')
