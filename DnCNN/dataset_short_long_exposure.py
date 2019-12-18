@@ -107,10 +107,6 @@ class DenoisingDataset(Dataset):
         mask_short = mask_short[rand_h:rand_h+self.opt.crop_size, rand_w:rand_w+self.opt.crop_size, :]
         mask_long = mask_long[rand_h:rand_h+self.opt.crop_size, rand_w:rand_w+self.opt.crop_size, :]
         
-        # normalization
-        img = torch.from_numpy(img.transpose(2, 0, 1)).contiguous()
-        noisy_img = torch.from_numpy(noisy_img.transpose(2, 0, 1)).contiguous()
-        
         ### return mode
         if self.opt.return_mode == 'short_denoising':
             img_short = np.zeros((img.shape[0] // 2, img.shape[1] // 2, img.shape[2] * 2), dtype = np.float64)
@@ -125,11 +121,11 @@ class DenoisingDataset(Dataset):
                 img_short[:, :, 3:6] = img[1::2, 0::2, :]
                 noisy_img_short[:, :, :3] = noisy_img[0::2, 1::2, :]
                 noisy_img_short[:, :, 3:6] = noisy_img[1::2, 0::2, :]
-        
+
         ### to tensor
-        img_short = torch.from_numpy(img_short).float().permute(2, 0, 1)
+        img_short = torch.from_numpy(img_short).float().permute(2, 0, 1).contiguous()
         noisy_img_short = torch.from_numpy(noisy_img_short).float().permute(2, 0, 1)
-        
+
         return img_short, noisy_img_short
     
     def __len__(self):
