@@ -30,7 +30,7 @@ def Trainer(opt):
     # Loss functions
     criterion_L2 = torch.nn.MSELoss().cuda()
 
-    # Initialize SGN
+    # Initialize DnCNN
     generator = utils.create_generator(opt)
 
     # To device
@@ -119,20 +119,21 @@ def Trainer(opt):
         if epoch == 0:
             iters_done = 0
 
-        ### training
+        ### Training
         for i, (noisy_img, img) in enumerate(train_loader):
 
             # To device
             noisy_img = noisy_img.cuda()
             img = img.cuda()
+            gt_res_img = noisy_img - img
 
             # Train Generator
             optimizer_G.zero_grad()
 
             # Forword propagation
             res_img = generator(noisy_img)
+            loss = criterion_L2(res_img, gt_res_img)
             recon_img = noisy_img - res_img
-            loss = criterion_L2(recon_img, img)
 
             # Record losses
             writer.add_scalar('data/L2Loss', loss.item(), iters_done)
@@ -154,10 +155,10 @@ def Trainer(opt):
             # Save model at certain epochs or iterations
             save_model(opt, (epoch + 1), (iters_done + 1), len(train_loader), generator)
 
-        # Learning rate decrease at certain epochs
-        adjust_learning_rate(opt, (epoch + 1), optimizer_G)
+            # Learning rate decrease at certain epochs
+            adjust_learning_rate(opt, (epoch + 1), optimizer_G)
 
-        ### sampling
+        ### Sampling
         utils.save_sample_png(opt, epoch, noisy_img, recon_img, img, addition_str = 'training')
 
         ### Validation
@@ -170,6 +171,7 @@ def Trainer(opt):
             # A is for input image, B is for target image
             val_noisy_img = val_noisy_img.cuda()
             val_img = val_img.cuda()
+            gt_res_img = noisy_img - img
 
             # Forward propagation
             res_img = generator(val_noisy_img)
@@ -185,7 +187,7 @@ def Trainer(opt):
         writer.add_scalar('data/val_PSNR', val_PSNR, epoch)
         print('PSNR at epoch %d: %.4f' % ((epoch + 1), val_PSNR))
 
-        ### sampling
-        utils.save_sample_png(opt, epoch, noisy_img, recon_img, img, addition_str = 'validation')
+        ### Sampling
+        utils.save_sample_png(opt, epoch, val_noisy_img, val_recon_img, val_img, addition_str = 'validation')
 
     writer.close()
