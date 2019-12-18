@@ -69,6 +69,12 @@ def save_sample_png(opt, epoch, noisy_img, recon_img, gt_img, addition_str = '')
         img_copy = img.clone().data.permute(0, 2, 3, 1).cpu().numpy()
         img_copy = np.clip(img_copy, 0, 255)
         img_copy = img_copy.astype(np.uint8)[0, :, :, :]
+        # If there is QuadBayer
+        if img_copy.shape[2] == 6:
+            temp = np.zeros((img_copy.shape[0] * 2, img_copy.shape[1] * 2, img_copy.shape[2] // 2), dtype = np.uint8)
+            temp[0::2, 0::2, :] = img_copy[:, :, :3]
+            temp[1::2, 1::2, :] = img_copy[:, :, 3:6]
+            img_copy = temp
         # Save to certain path
         if i == 0:
             save_img_name = 'epoch' + str(epoch) + addition_str + '_noisy.png'
