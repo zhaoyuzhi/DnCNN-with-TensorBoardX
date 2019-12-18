@@ -34,7 +34,7 @@ class DenoisingDataset(Dataset):
     def __getitem__(self, index):
         
         ## read an image
-        img = cv2.imread(self.imglist[index])
+        img = cv2.imread(self.imglist[index], -1) # preserve the original dynamic range
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         # normalization
