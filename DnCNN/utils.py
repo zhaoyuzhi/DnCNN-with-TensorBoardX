@@ -83,6 +83,7 @@ def save_sample_png(opt, epoch, noisy_img, recon_img, gt_img, addition_str = '')
         else:
             save_img_name = 'epoch' + str(epoch) + addition_str + '_gt.png'
         save_img_path = os.path.join(opt.sample_root, save_img_name)
+        img_copy = cv2.cvtColor(img_copy, cv2.COLOR_BGR2RGB)
         cv2.imwrite(save_img_path, img_copy)
 
 def psnr(pred, target, pixel_max_cnt = 1):
