@@ -66,12 +66,12 @@ if __name__ == "__main__":
     generator = utils.create_generator(opt)
     generator = generator.cuda()
 
-    for batch_idx, (noisy_img, img, imgpath) in enumerate(dataloader):
+    for batch_idx, (noisy_img, img, imgname) in enumerate(dataloader):
 
         # To Tensor
         noisy_img = noisy_img.cuda()
         img = img.cuda()
-        imgpath = imgpath[0]
+        imgname = imgname[0]
 
         # Generator output
         res_img = generator(noisy_img)
@@ -91,8 +91,8 @@ if __name__ == "__main__":
         show_img = cv2.merge([b, g, r])
         
         # save
-        utils.check_path(opt.savepath)
-        savepath = os.path.join(opt.saveroot, imgpath)
+        utils.check_path(opt.saveroot)
+        savepath = os.path.join(opt.saveroot, imgname)
         print(savepath)
         #recon_img = cv2.cvtColor(recon_img, cv2.COLOR_BGR2GRAY)
         cv2.imwrite(savepath, recon_img)
