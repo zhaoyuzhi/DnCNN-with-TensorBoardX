@@ -93,6 +93,7 @@ class FullResDenoisingDataset(Dataset):
         
         ## read an image
         imgpath = self.imglist[index]
+        imgname = imgpath.split('\\')[-1]
         img = cv2.imread(imgpath)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -108,7 +109,7 @@ class FullResDenoisingDataset(Dataset):
         img = torch.from_numpy(img.transpose(2, 0, 1)).contiguous()
         noisy_img = torch.from_numpy(noisy_img.transpose(2, 0, 1)).contiguous()
 
-        return noisy_img, img, imgpath
+        return noisy_img, img, imgname
     
     def __len__(self):
         return len(self.imglist)
