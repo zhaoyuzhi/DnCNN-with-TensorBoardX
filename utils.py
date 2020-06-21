@@ -140,3 +140,9 @@ def text_save(content, filename, mode = 'a'):
     for i in range(len(content)):
         file.write(str(content[i]) + '\n')
     file.close()
+
+# multi-layer folder
+def check_path(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+        

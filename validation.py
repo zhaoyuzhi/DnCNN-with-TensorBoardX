@@ -1,4 +1,5 @@
 import argparse
+import os
 import cv2
 import numpy as np
 import torch
@@ -30,6 +31,9 @@ if __name__ == "__main__":
     parser.add_argument('--baseroot', type = str, \
         default = "C:\\Users\\yzzha\\Desktop\\dataset\\ILSVRC2012_val_256_maksed", \
             help = 'the testing folder')
+    parser.add_argument('--saveroot', type = str, \
+        default = "./results", \
+            help = 'the saving folder')
     parser.add_argument('--batch_size', type = int, default = 1, help = 'test batch size, always 1')
     parser.add_argument('--crop_size', type = int, default = 256, help = 'single patch size')
     '''
@@ -72,7 +76,6 @@ if __name__ == "__main__":
         # Generator output
         res_img = generator(noisy_img)
         recon_img = noisy_img - res_img
-        print(recon_img.shape)
 
         # convert to visible image format
         img = img.cpu().numpy().reshape(3, opt.crop_size, opt.crop_size).transpose(1, 2, 0)
@@ -86,6 +89,10 @@ if __name__ == "__main__":
         show_img = np.concatenate((img, recon_img), axis = 1)
         r, g, b = cv2.split(show_img)
         show_img = cv2.merge([b, g, r])
-        cv2.imshow('comparison.jpg', show_img)
-        cv2.waitKey(1)
-        cv2.imwrite('result_%d.jpg' % batch_idx, recon_img)
+        
+        # save
+        utils.check_path(opr.savepath)
+        savepath = os.path.join(opt.saveroot, imgpath)
+        print(savepath)
+        recon_img = cv2.cvtColor(recon_img, cv2.COLOR_BGR2GRAY)
+        cv2.imwrite(savepath, recon_img)
