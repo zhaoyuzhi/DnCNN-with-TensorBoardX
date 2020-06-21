@@ -91,8 +91,8 @@ if __name__ == "__main__":
         show_img = cv2.merge([b, g, r])
         
         # save
-        utils.check_path(opr.savepath)
+        utils.check_path(opt.savepath)
         savepath = os.path.join(opt.saveroot, imgpath)
         print(savepath)
-        recon_img = cv2.cvtColor(recon_img, cv2.COLOR_BGR2GRAY)
+        #recon_img = cv2.cvtColor(recon_img, cv2.COLOR_BGR2GRAY)
         cv2.imwrite(savepath, recon_img)
