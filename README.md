@@ -4,6 +4,11 @@ The PyTorch implementation of TIP 2017 paper DnCNN, the pioneer DL-based work re
 
 We also provide real-time validation and visulization.
 
+A TensorBoardX usage sample is given as:
+```
+tensorboard --logdir=runs --host=10.1.75.35 --port=9512
+```
+
 ## 1 Noise Estimate
 
 At first, the estimation PSNR of given noise range is shown as follows:
